@@ -65,6 +65,12 @@ def post_to_wordpress(title, content):
     )
     return response.json()
 
+# Example API request to fetch tasks
+response = requests.get("https://api.clickup.com/api/v2/task", headers=headers)
+
+# Print the response
+print(response.json())
+
 def main():
     """Main function to execute Airth automation tasks."""
     load_env_variables()
