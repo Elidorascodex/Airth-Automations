@@ -78,8 +78,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-`````
-__pycache__/
-.env
-*.log
-.vscode/
