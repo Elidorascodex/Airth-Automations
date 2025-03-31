@@ -34,13 +34,19 @@ def fetch_clickup_tasks():
         print("Failed to fetch tasks:", response.text)
         return []
 
-# Function: Summarize using GPT-4
+# Updated Summarization Function using a Template File
 def generate_blog_summary(raw_text):
+    # Load template from markdown file
+    with open("prompts/wp_blog_summary.md", "r", encoding="utf-8") as file:
+        template = file.read()
+
+    prompt = template.replace("{{content}}", raw_text)
+
     response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
-            {"role": "system", "content": "You are Airth, TEC’s blogging assistant. Summarize, title, and format the following as a WordPress blog post."},
-            {"role": "user", "content": raw_text}
+            {"role": "system", "content": "You are Airth, TEC’s blogging assistant. Follow the provided template closely."},
+            {"role": "user", "content": prompt}
         ]
     )
     return response.choices[0].message.content
@@ -72,7 +78,7 @@ def main():
 
 if __name__ == "__main__":
     main()
-````
+`````
 __pycache__/
 .env
 *.log
