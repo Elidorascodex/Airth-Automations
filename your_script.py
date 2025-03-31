@@ -12,4 +12,24 @@ wp_site_url = os.getenv("WP_SITE_URL")
 wp_user = os.getenv("WP_USER")
 wp_app_pass = os.getenv("WP_APP_PASS")
 
+# Debugging: Print the ClickUp API token to verify it's loaded
+print("ClickUp Token Loaded:", clickup_api_token)
+
+# Debugging: Print the ClickUp List ID to verify it's loaded
+print("ClickUp List ID Loaded:", clickup_list_id)
+
+# Function to fetch ClickUp tasks
+def fetch_clickup_tasks():
+    headers = {
+        "Authorization": clickup_api_token
+    }
+    url = f"https://api.clickup.com/api/v2/list/{clickup_list_id}/task"
+    print("Fetching tasks from URL:", url)  # Debugging: Print the API URL
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json().get("tasks", [])
+    else:
+        print("Failed to fetch tasks:", response.json())  # Improved error logging
+        return []
+
 # ...use these variables in your script...
