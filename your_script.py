@@ -19,8 +19,28 @@ print("ClickUp Token Loaded:", clickup_api_token)
 # Debugging: Print the ClickUp List ID to verify it's loaded
 print("ClickUp List ID Loaded:", clickup_list_id)
 
+# Function to validate environment variables
+def validate_env_vars():
+    required_vars = {
+        "OPENAI_API_KEY": openai_api_key,
+        "CLICKUP_API_TOKEN": clickup_api_token,
+        "CLICKUP_LIST_ID": clickup_list_id,
+        "WP_SITE_URL": wp_site_url,
+        "WP_USER": wp_user,
+        "WP_APP_PASS": wp_app_pass,
+    }
+    for var_name, var_value in required_vars.items():
+        if not var_value:
+            print(f"Error: Missing environment variable {var_name}")
+            return False
+    return True
+
 # Function to fetch ClickUp tasks
 def fetch_clickup_tasks():
+    if not validate_env_vars():
+        print("Environment validation failed. Exiting.")
+        return []
+
     headers = {
         "Authorization": clickup_api_token
     }
