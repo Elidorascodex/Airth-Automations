@@ -1,0 +1,70 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "functionCode": "const axios = require('axios');\n\nconst apiUrl = 'https://api.example.com/content';\n\nasync function fetchContent() {\n  const response = await axios.get(apiUrl);\n  return response.data;\n}\n\nfetchContent();"
+      },
+      "name": "Fetch Content",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "webhookId": "1",
+        "responseMode": "onReceived"
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "task",
+        "operation": "create",
+        "projectId": "123",
+        "name": "New Content Distribution Task",
+        "description": "This task is created for distributing new content."
+      },
+      "name": "Create ClickUp Task",
+      "type": "n8n-nodes-base.clickup",
+      "typeVersion": 1,
+      "position": [
+        400,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Fetch Content": {
+      "main": [
+        [
+          {
+            "node": "Create ClickUp Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Fetch Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
