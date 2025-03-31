@@ -19,11 +19,13 @@ wp_url = os.getenv("WP_SITE_URL") + "/wp-json/wp/v2/posts"
 clickup_api_token = os.getenv("CLICKUP_API_TOKEN")
 clickup_list_id = os.getenv("CLICKUP_LIST_ID")
 
+headers = {
+    "Authorization": os.getenv("CLICKUP_API_TOKEN"),
+    "Content-Type": "application/json"
+}
+
 # Get tasks from ClickUp
 def fetch_clickup_tasks():
-    headers = {
-        "Authorization": clickup_api_token
-    }
     response = requests.get(
         f"https://api.clickup.com/api/v2/list/{clickup_list_id}/task",
         headers=headers
