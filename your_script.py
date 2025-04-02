@@ -13,12 +13,6 @@ wp_site_url = os.getenv("WP_SITE_URL")
 wp_user = os.getenv("WP_USER")
 wp_app_pass = os.getenv("WP_APP_PASS")
 
-# Debugging: Print the ClickUp API token to verify it's loaded
-print("ClickUp Token Loaded:", clickup_api_token)
-
-# Debugging: Print the ClickUp List ID to verify it's loaded
-print("ClickUp List ID Loaded:", clickup_list_id)
-
 # Function to validate environment variables
 def validate_env_vars():
     required_vars = {
@@ -45,7 +39,6 @@ def fetch_clickup_tasks():
         "Authorization": clickup_api_token
     }
     url = f"https://api.clickup.com/api/v2/list/{clickup_list_id}/task"
-    print("Fetching tasks from URL:", url)  # Debugging: Print the API URL
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         return response.json().get("tasks", [])
@@ -53,4 +46,31 @@ def fetch_clickup_tasks():
         print("Failed to fetch tasks:", response.json())  # Improved error logging
         return []
 
-# ...use these variables in your script...
+# Function to post data to WordPress
+def post_to_wordpress(title, content):
+    if not validate_env_vars():
+        print("Environment validation failed. Exiting.")
+        return False
+
+    url = f"{wp_site_url}/wp-json/wp/v2/posts"
+    auth = (wp_user, wp_app_pass)
+    data = {
+        "title": title,
+        "content": content,
+        "status": "publish"
+    }
+    response = requests.post(url, auth=auth, json=data)
+    if response.status_code == 201:
+        print("Post published successfully:", response.json().get("link"))
+        return True
+    else:
+        print("Failed to publish post:", response.json())  # Improved error logging
+        return False
+
+# Example usage
+if __name__ == "__main__":
+    tasks = fetch_clickup_tasks()
+    for task in tasks:
+        title = task.get("name", "Untitled Task")
+        content = task.get("description", "No description provided.")
+        post_to_wordpress(title, content)

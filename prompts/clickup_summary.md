@@ -2,28 +2,28 @@
 
 ## ClickUp Task Summary
 
-### Task Title:
+### Task Title
 [Insert Task Title Here]
 
-### Task Description:
+### Task Description
 [Provide a brief description of the task, including its purpose and objectives.]
 
-### Status:
+### Status
 [Indicate the current status of the task (e.g., To Do, In Progress, Completed).]
 
-### Due Date:
+### Due Date
 [Specify the due date for the task.]
 
-### Assigned To:
+### Assigned To
 [Name of the person or team responsible for the task.]
 
-### Priority:
+### Priority
 [Indicate the priority level (e.g., Low, Medium, High).]
 
-### Comments:
+### Comments
 [Add any relevant comments or notes regarding the task.]
 
-### Next Steps:
+### Next Steps
 [List the next steps to be taken for this task.]
 
 ---
