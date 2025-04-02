@@ -67,6 +67,11 @@ def post_to_wordpress(title, content):
         print("Failed to publish post:", response.json())  # Improved error logging
         return False
 
+def fetch_data():
+    """Fetch data from API"""
+    response = requests.get('https://api.example.com/data')
+    return response.json()
+
 # Example usage
 if __name__ == "__main__":
     tasks = fetch_clickup_tasks()
