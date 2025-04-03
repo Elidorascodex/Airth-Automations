@@ -1,3 +1,7 @@
+"""
+Your Script for Automating ClickUp and WordPress Integration
+"""
+
 from dotenv import load_dotenv
 import os
 import requests
@@ -13,8 +17,11 @@ wp_site_url = os.getenv("WP_SITE_URL")
 wp_user = os.getenv("WP_USER")
 wp_app_pass = os.getenv("WP_APP_PASS")
 
-# Function to validate environment variables
+
 def validate_env_vars():
+    """
+    Validate that all required environment variables are loaded.
+    """
     required_vars = {
         "OPENAI_API_KEY": openai_api_key,
         "CLICKUP_API_TOKEN": clickup_api_token,
@@ -29,50 +36,45 @@ def validate_env_vars():
             return False
     return True
 
-# Function to fetch ClickUp tasks
+
 def fetch_clickup_tasks():
+    """
+    Fetch tasks from ClickUp using the API.
+    """
     if not validate_env_vars():
         print("Environment validation failed. Exiting.")
         return []
 
-    headers = {
-        "Authorization": clickup_api_token
-    }
+    headers = {"Authorization": clickup_api_token}
     url = f"https://api.clickup.com/api/v2/list/{clickup_list_id}/task"
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         return response.json().get("tasks", [])
     else:
-        print("Failed to fetch tasks:", response.json())  # Improved error logging
+        print("Failed to fetch tasks:", response.json())
         return []
 
-# Function to post data to WordPress
+
 def post_to_wordpress(title, content):
+    """
+    Post a task to WordPress as a blog post.
+    """
     if not validate_env_vars():
         print("Environment validation failed. Exiting.")
         return False
 
     url = f"{wp_site_url}/wp-json/wp/v2/posts"
     auth = (wp_user, wp_app_pass)
-    data = {
-        "title": title,
-        "content": content,
-        "status": "publish"
-    }
+    data = {"title": title, "content": content, "status": "publish"}
     response = requests.post(url, auth=auth, json=data)
     if response.status_code == 201:
         print("Post published successfully:", response.json().get("link"))
         return True
     else:
-        print("Failed to publish post:", response.json())  # Improved error logging
+        print("Failed to publish post:", response.json())
         return False
 
-def fetch_data():
-    """Fetch data from API"""
-    response = requests.get('https://api.example.com/data')
-    return response.json()
 
-# Example usage
 if __name__ == "__main__":
     tasks = fetch_clickup_tasks()
     for task in tasks:
