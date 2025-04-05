@@ -26,6 +26,12 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: Lint shell scripts with ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          shellcheck .venv/Scripts/activate
+
       - name: Build release distributions
         run: |
           python -m pip install build
