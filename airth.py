@@ -1,88 +1,58 @@
-# Airth Automation Script
-
+# airth.py — Manual TEC Prompt to Blog
 import os
 import openai
 import requests
 from dotenv import load_dotenv
 
-def load_env_variables():
-    """Load environment variables from .env file."""
-    load_dotenv()
-
-# Load API keys from .env file
-load_env_variables()
+# Load environment variables
+load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 wp_user = os.getenv("WP_USER")
-wp_password = os.getenv("WP_APP_PASS")
+wp_pass = os.getenv("WP_APP_PASS")
 wp_url = os.getenv("WP_SITE_URL") + "/wp-json/wp/v2/posts"
-clickup_api_token = os.getenv("CLICKUP_API_TOKEN")
-clickup_list_id = os.getenv("CLICKUP_LIST_ID")
 
-headers = {
-    "Authorization": os.getenv("CLICKUP_API_TOKEN"),
-    "Content-Type": "application/json"
-}
+def validate_env():
+    required = [openai.api_key, wp_user, wp_pass, wp_url]
+    if not all(required):
+        print("❌ Missing .env values")
+        exit()
 
-# Get tasks from ClickUp
-def fetch_clickup_tasks():
-    response = requests.get(
-        f"https://api.clickup.com/api/v2/list/{clickup_list_id}/task",
-        headers=headers
-    )
-    if response.status_code == 200:
-        return response.json()["tasks"]
-    else:
-        print("Failed to fetch tasks:", response.text)
-        return []
-
-# Updated Summarization Function using a Template File
-def generate_blog_summary(raw_text):
-    # Load template from markdown file
-    with open("prompts/wp_blog_summary.md", "r", encoding="utf-8") as file:
-        template = file.read()
-
-    prompt = template.replace("{{content}}", raw_text)
-
-    response = openai.ChatCompletion.create(
+def summarize(raw):
+    res = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
-            {"role": "system", "content": "You are Airth, TEC’s blogging assistant. Follow the provided template closely."},
-            {"role": "user", "content": prompt}
+            {"role": "system", "content": "You are AIRTH, summarizing and formatting raw TEC lore into WordPress blog content."},
+            {"role": "user", "content": raw}
         ]
     )
-    return response.choices[0].message.content
+    return res.choices[0].message.content
 
-# Function: Post to WordPress as a draft
-def post_to_wordpress(title, content):
-    response = requests.post(
-        wp_url,
-        auth=(wp_user, wp_password),
-        json={
-            "title": title,
-            "content": content,
-            "status": "draft",  # Change to 'publish' if ready
-            "categories": [1]  # Optional: category ID
-        }
+def post(title, content):
+    res = requests.post(wp_url, auth=(wp_user, wp_pass), json={
+        "title": title,
+        "content": content,
+        "status": "draft"
+    })
+    print("✅ Draft Created:", res.json().get("link"))
+
+def get_openai_response(prompt):
+    """Fetch a response from OpenAI API."""
+    response = openai.Completion.create(
+        engine="davinci-codex",
+        prompt=prompt,
+        max_tokens=50
     )
+    return response.choices[0].text.strip()
+
+def fetch_data(url):
+    """Fetch JSON data from a given URL."""
+    response = requests.get(url)
+    response.raise_for_status()
     return response.json()
 
-# Example API request to fetch tasks
-response = requests.get("https://api.clickup.com/api/v2/task", headers=headers)
-
-# Print the response
-print(response.json())
-
-def main():
-    """Main function to execute Airth automation tasks."""
-    load_env_variables()
-    tasks = fetch_clickup_tasks()
-    for task in tasks:
-        raw_input = task["description"]  # You can change this to task["name"] or task["text_content"]
-        blog_content = generate_blog_summary(raw_input)
-        title = blog_content.split("\n")[0][:70]  # crude title grab
-        post = post_to_wordpress(title, blog_content)
-        print("✅ Posted:", post['link'])
-
 if __name__ == "__main__":
-    main()
+    validate_env()
+    raw = input("📜 Paste raw TEC content: ")
+    result = summarize(raw)
+    post(result.split("\n")[0][:70], result)

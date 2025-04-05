@@ -50,9 +50,8 @@ def fetch_clickup_tasks():
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         return response.json().get("tasks", [])
-    else:
-        print("Failed to fetch tasks:", response.json())
-        return []
+    print("Failed to fetch tasks:", response.json())
+    return []
 
 
 def post_to_wordpress(title, content):
@@ -70,9 +69,8 @@ def post_to_wordpress(title, content):
     if response.status_code == 201:
         print("Post published successfully:", response.json().get("link"))
         return True
-    else:
-        print("Failed to publish post:", response.json())
-        return False
+    print("Failed to publish post:", response.json())
+    return False
 
 
 if __name__ == "__main__":
